@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5E47A8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="영어500제">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>영어 500제 대시보드</title>
+<style>
+:root{
+  --bg:#f6f5fb;--panel:#ffffff;--panel2:#f3f0fb;--text:#22202a;--muted:#6f6a7d;
+  --line:#ddd7eb;--accent:#5E47A8;--accent2:#856fd0;--accentSoft:#ede8fb;
+  --good:#1d704f;--goodSoft:#d9f1e6;--warn:#8d5c00;--warnSoft:#fff1cb;--bad:#b3261e;--badSoft:#faddda;
+  --shadow:0 8px 30px rgba(37,26,70,.08);--radius:18px;--inputH:50px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;line-height:1.45}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.shell{min-height:100vh;display:grid;grid-template-columns:260px 1fr}
+.sidebar{position:sticky;top:0;height:100vh;background:#201731;color:#fff;padding:24px 16px;overflow:auto}
+.brand{padding:4px 10px 18px}
+.brand h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em}
+.brand p{margin:7px 0 0;color:rgba(255,255,255,.68);font-size:13px}
+.nav{display:grid;gap:8px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:14px;padding:13px 14px;background:transparent;color:rgba(255,255,255,.82);text-align:left;font-weight:600}
+.nav button.active{background:rgba(255,255,255,.12);color:#fff}
+.nav .ico{width:20px;text-align:center;opacity:.95}
+.sidefoot{margin:22px 10px 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.58);font-size:12px}
+.main{min-width:0;padding:28px 28px 96px}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:22px}
+.topbar h2{margin:0;font-size:30px;letter-spacing:-.04em}
+.topbar p{margin:6px 0 0;color:var(--muted)}
+.topActions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:14px;padding:11px 15px;font-weight:700;white-space:nowrap}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:#fff}
+.btn.bad{color:var(--bad);border-color:#efc2be;background:#fff}
+.btn.sm{padding:8px 10px;border-radius:11px;font-size:13px}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;gap:16px}
+.metrics{grid-template-columns:repeat(5,minmax(0,1fr))}
+.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card,.callout{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card{padding:18px}
+.callout{padding:18px;background:var(--accentSoft);border-color:#d8c9f6}
+.metric .k{font-size:13px;color:var(--muted)}.metric .v{margin-top:8px;font-size:30px;font-weight:800;letter-spacing:-.04em}.metric .s{margin-top:7px;font-size:12px;color:var(--muted)}
+.sectionHead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:28px 0 12px}
+.sectionHead h3{margin:0;font-size:19px}.sectionHead p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:var(--accentSoft);color:var(--accent);font-size:11px;font-weight:800}
+.badge.good{background:var(--goodSoft);color:var(--good)}.badge.warn{background:var(--warnSoft);color:var(--warn)}.badge.bad{background:var(--badSoft);color:var(--bad)}
+.tableWrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+table{width:100%;min-width:980px;border-collapse:collapse}th,td{padding:12px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:13px}th{background:#f5f2fb;color:#5f596b;font-size:12px;position:sticky;top:0;z-index:1}tr:last-child td{border-bottom:0}
+.list{display:grid;gap:12px}.item{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}.item h4{margin:0;font-size:14px}.item p{margin:6px 0 0;color:var(--muted);font-size:12px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.track{height:10px;border-radius:999px;background:#ece7f7;overflow:hidden;margin-top:8px}.fill{height:100%;background:var(--accent)}
+.chart{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;color:var(--muted);font-size:12px}.legend span{display:flex;align-items:center;gap:7px}.dot{width:10px;height:10px;border-radius:50%}
+.small{font-size:12px;color:var(--muted)}
+.formLayout{display:grid;gap:16px}
+.quickForm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.group{display:flex;flex-direction:column;gap:6px}
+.group label{font-size:13px;font-weight:800}
+.group input,.group select,.group textarea{width:100%;height:var(--inputH);padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--text);font-size:16px;line-height:1.25;outline:none}
+.group textarea{height:108px;resize:vertical}
+.group input:focus,.group select:focus,.group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,71,168,.13)}
+.hint{font-size:12px;color:var(--muted)}
+.full{grid-column:1/-1}
+.presetBox{display:flex;flex-wrap:wrap;gap:10px;padding:14px;border:1px dashed #cfc3eb;border-radius:16px;background:#faf8ff}
+.presetChip{display:flex;align-items:center;gap:6px;padding:9px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:13px}
+.wrongBox{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}
+.wrongBtn{height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:800}
+.wrongBtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.helper{display:flex;flex-wrap:wrap;gap:8px}
+.helper button{border:1px dashed #c9bce8;background:#fff;border-radius:10px;padding:8px 10px;font-size:12px;color:var(--accent);font-weight:700}
+.details{border:1px solid var(--line);border-radius:16px;background:#fbfaff;overflow:hidden}
+.details summary{padding:14px 16px;font-weight:800;cursor:pointer;list-style:none}.details summary::-webkit-details-marker{display:none}.details .body{padding:0 16px 16px}
+.formActions{display:flex;flex-wrap:wrap;gap:8px}
+.previewChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.chip{background:#f4f1fa;border-radius:11px;padding:8px 10px;font-size:12px}
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:13px}.check input{margin:0;width:16px;height:16px}
+.dangerBox{border-color:#efc4c1}
+.toast{position:fixed;right:18px;bottom:18px;z-index:70;background:#2b223f;color:#fff;padding:12px 15px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:none}
+.mobileNav{display:none}
+@media (max-width:1200px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.five{grid-template-columns:repeat(3,minmax(0,1fr))}.quickForm{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.quickForm,.three{grid-template-columns:repeat(2,minmax(0,1fr))}.wrongBox{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:760px){.shell{display:block}.sidebar{display:none}.main{padding:18px 14px 92px}.topbar{flex-direction:column;align-items:flex-start}.topbar h2{font-size:25px}.metrics,.two,.five,.three{grid-template-columns:1fr}.quickForm{grid-template-columns:1fr}.mobileNav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:8px;right:8px;bottom:8px;z-index:60;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:18px;padding:7px;box-shadow:var(--shadow)}.mobileNav button{border:0;background:transparent;border-radius:12px;padding:9px 4px;font-size:10px;color:var(--muted)}.mobileNav button.active{background:var(--accentSoft);color:var(--accent);font-weight:800}}
+@media print{.sidebar,.mobileNav,.topActions,#entry,#settings{display:none!important}.page{display:block!important;page-break-after:always}.main{padding:0}.card,.callout{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><h1>영어 500제 대시보드</h1><p>성과 · 난이도 · 병목 · 로드맵</p></div>
+    <nav class="nav" id="deskNav">
+      <button class="active" data-page="dashboard"><span class="ico">▦</span> 성과 종합</button>
+      <button data-page="analysis"><span class="ico">⌁</span> 취약점·병목</button>
+      <button data-page="rounds"><span class="ico">☷</span> 회차 기록</button>
+      <button data-page="entry"><span class="ico">＋</span> 입력·수정</button>
+      <button data-page="roadmap"><span class="ico">↗</span> 21~40회 로드맵</button>
+      <button data-page="settings"><span class="ico">⚙</span> 백업·설정</button>
+    </nav>
+    <div class="sidefoot">운영 규약 v2.0<br>데이터는 이 브라우저에 저장됩니다.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h2 id="pageTitle">성과 종합</h2><p id="pageSub">누적 성과와 최근 추세를 확인합니다.</p></div>
+      <div class="topActions">
+        <button class="btn" id="printBtn">인쇄</button>
+        <button class="btn primary" id="quickAddBtn">새 회차 입력</button>
+      </div>
+    </div>
+
+    <section id="dashboard" class="page active">
+      <div id="metricGrid" class="grid metrics"></div>
+      <div id="overallCallout" class="callout" style="margin-top:16px"></div>
+
+      <div class="sectionHead"><div><h3>성장지수 · 난이도 · 난도 보정 성취</h3><p>동일한 0~100 축에서 회차별 흐름을 비교합니다.</p></div></div>
+      <div class="card"><svg id="performanceChart" class="chart" viewBox="0 0 820 360"></svg><div class="legend"><span><i class="dot" style="background:#5E47A8"></i>종합 성장지수</span><span><i class="dot" style="background:#856fd0"></i>객관 난이도</span><span><i class="dot" style="background:#1d704f"></i>난도 보정 성취</span></div></div>
+
+      <div class="sectionHead"><div><h3>최근 회차</h3><p>최신 5개 회차의 공식 기록입니다.</p></div></div>
+      <div class="tableWrap"><table><thead><tr><th>회차</th><th>실제/제한</th><th>오답</th><th>정확도</th><th>시간효율</th><th>성장지수</th><th>난이도</th><th>평가</th><th></th></tr></thead><tbody id="recentRows"></tbody></table></div>
+    </section>
+
+    <section id="analysis" class="page">
+      <div class="grid two">
+        <div><div class="sectionHead" style="margin-top:0"><div><h3>취약 유형</h3><p>정확도와 평균시간을 함께 봅니다.</p></div></div><div id="weakTypeList" class="list"></div></div>
+        <div><div class="sectionHead" style="margin-top:0"><div><h3>시간 병목</h3><p>3분 이상 문항과 구간 평균입니다.</p></div></div><div id="bottleneckList" class="list"></div></div>
+      </div>
+      <div class="sectionHead"><div><h3>기록 점검</h3><p>상세시간 누락과 합계 불일치를 숨기지 않고 유지합니다.</p></div></div>
+      <div id="auditGrid" class="grid two"></div>
+      <div class="sectionHead"><div><h3>학습 개입</h3><p>개입 시작점과 전후 변화를 자동 비교합니다.</p></div></div>
+      <div id="interventionGrid" class="grid two"></div>
+    </section>
+
+    <section id="rounds" class="page">
+      <div class="sectionHead" style="margin-top:0"><div><h3>전체 회차 기록</h3><p>수정 버튼으로 회차 기록을 다시 불러옵니다.</p></div><button class="btn primary" id="addFromTableBtn">새 회차</button></div>
+      <div class="tableWrap"><table><thead><tr><th>회차</th><th>제한</th><th>실제</th><th>초과</th><th>오답</th><th>정확도</th><th>시간효율</th><th>성장지수</th><th>난이도</th><th>난도 보정</th><th>평가</th><th></th></tr></thead><tbody id="allRoundRows"></tbody></table></div>
+    </section>
+
+    <section id="entry" class="page">
+      <div class="card">
+        <div class="sectionHead" style="margin-top:0"><div><h3 id="formTitle">새 회차 입력</h3><p>회차를 선택하면 제한시간·난이도·3점 문항 기본값이 자동으로 채워집니다.</p></div><span id="editBadge" class="badge" style="display:none">수정 중</span></div>
+
+        <div class="formLayout">
+          <div class="presetBox">
+            <div class="presetChip"><strong id="presetRoundLabel">21회 기본값</strong></div>
+            <div class="presetChip">제한시간 <strong id="presetLimitLabel">17:00</strong></div>
+            <div class="presetChip">객관 난이도 <strong id="presetDiffLabel">74.0</strong></div>
+            <div class="presetChip">3점 <strong id="presetThreeLabel">2·4·5·8</strong></div>
+            <button class="btn sm" id="applyPresetBtn" type="button">기본값 다시 적용</button>
+          </div>
+
+          <div class="quickForm">
+            <div class="group"><label for="fRound">회차</label><select id="fRound"></select></div>
+            <div class="group"><label for="fDate">응시일</label><input id="fDate" type="date"></div>
+            <div class="group"><label for="fTotal">실제 전체시간</label><input id="fTotal" type="text" placeholder="예: 23:10"></div>
+            <div class="group"><label for="fLimit">PDF 제한시간</label><input id="fLimit" type="text" placeholder="자동 입력"></div>
+          </div>
+
+          <div class="group">
+            <label>오답 번호</label>
+            <div class="wrongBox" id="wrongButtons"></div>
+            <div class="helper"><button type="button" id="wrongNoneBtn">오답 없음</button><button type="button" id="wrongClearBtn">선택 해제</button></div>
+            <div class="hint">탭해서 오답 문항을 선택하세요. 아래 입력칸은 자동 동기화됩니다.</div>
+            <input id="fWrong" type="text" placeholder="예: 2, 6">
+          </div>
+
+          <div class="quickForm">
+            <div class="group"><label for="fDiff">객관 난이도</label><input id="fDiff" type="number" step="0.1"></div>
+            <div class="group"><label for="f3">3점 문항</label><input id="f3" type="text" placeholder="자동 입력"></div>
+            <div class="group full"><label for="fNotes">특이사항</label><textarea id="fNotes" placeholder="예: 단어장 학습 후 응시, 어법 4번에서 오래 멈춤"></textarea></div>
+          </div>
+
+          <details class="details" open>
+            <summary>상세시간 입력(선택)</summary>
+            <div class="body">
+              <div class="group full"><label for="fTiming">문제별·구간별 시간</label><textarea id="fTiming" placeholder="예시&#10;1=2:14&#10;2=2:55&#10;4-6=9:00 group&#10;9-10=7:49 derived"></textarea><div class="hint">단일 문항은 exact, 범위는 group이 기본입니다. 역산이면 derived를 붙이세요.</div></div>
+              <div class="helper"><button type="button" data-insert="1=2:00">1번 틀 만들기</button><button type="button" data-insert="1-4=8:00 group">구간 틀 만들기</button><button type="button" data-insert="9-10=4:00 derived">역산 틀 만들기</button></div>
+            </div>
+          </details>
+
+          <details class="details">
+            <summary>고급 설정(유형·난이도 상세·개입)</summary>
+            <div class="body">
+              <div class="quickForm">
+                <div class="group full"><label for="fTypes">문항 유형 10개</label><input id="fTypes" type="text" placeholder="비워 두면 기본 배열 사용"><div class="hint">기본 배열과 다를 때만 10개를 쉼표로 입력하세요.</div></div>
+                <div class="group"><label for="d1">3점 배치·유형 /25</label><input id="d1" type="number" step="0.1"></div>
+                <div class="group"><label for="d2">유형 구성 부담 /20</label><input id="d2" type="number" step="0.1"></div>
+                <div class="group"><label for="d3">읽기 분량 /20</label><input id="d3" type="number" step="0.1"></div>
+                <div class="group"><label for="d4">문장 복잡도 /20</label><input id="d4" type="number" step="0.1"></div>
+                <div class="group"><label for="d5">어휘 복잡도 /15</label><input id="d5" type="number" step="0.1"></div>
+              </div>
+              <div class="group" style="margin-top:12px"><label>학습 개입 적용</label><div id="interventionChecks" class="checks"></div></div>
+            </div>
+          </details>
+
+          <div class="card" style="padding:14px 16px">
+            <strong>입력 미리보기</strong>
+            <div id="formPreview" class="small" style="margin-top:8px">전체시간과 오답을 입력하면 예상 지표가 표시됩니다.</div>
+          </div>
+
+          <div class="formActions"><button class="btn primary" id="saveRoundBtn" type="button">저장</button><button class="btn" id="clearFormBtn" type="button">새 입력</button><button class="btn bad" id="deleteRoundBtn" type="button" style="display:none">이 회차 삭제</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="roadmap" class="page">
+      <div id="nextGoalCallout" class="callout"></div>
+      <div class="sectionHead"><div><h3>실제시간과 21~40회 목표시간</h3><p>실선은 실제시간, 점선은 기본 목표입니다.</p></div></div>
+      <div class="card"><svg id="roadmapChart" class="chart" viewBox="0 0 840 360"></svg><div class="legend"><span><i class="dot" style="background:#5E47A8"></i>실제시간</span><span><i class="dot" style="background:#856fd0"></i>목표시간</span></div></div>
+      <div class="sectionHead"><div><h3>5단계 로드맵</h3><p>현재 달성 상태에 따라 단계가 자동 표시됩니다.</p></div></div>
+      <div id="stageCards" class="grid five"></div>
+      <div class="sectionHead"><div><h3>21~40회 목표표</h3><p>회차 결과가 입력되면 달성 상태가 자동으로 바뀝니다.</p></div></div>
+      <div class="tableWrap"><table><thead><tr><th>회차</th><th>단계</th><th>목표시간</th><th>정확도</th><th>병목</th><th>문항 상한</th><th>핵심 초점</th><th>상태</th></tr></thead><tbody id="goalRows"></tbody></table></div>
+    </section>
+
+    <section id="settings" class="page">
+      <div class="grid two">
+        <div class="card"><h3 style="margin-top:0">백업·복원</h3><p class="small">기기 변경 전에는 JSON 백업을 저장하세요.</p><div class="topActions" style="margin-top:14px"><button class="btn primary" id="exportJsonBtn">JSON 백업</button><button class="btn" id="exportCsvBtn">CSV 저장</button><label class="btn" style="display:inline-flex;align-items:center;gap:8px">JSON 불러오기<input id="importJsonInput" type="file" accept=".json,application/json" style="display:none"></label></div></div>
+        <div class="card"><h3 style="margin-top:0">학습 개입 관리</h3><div id="interventionManager" class="list"></div><div class="quickForm" style="margin-top:14px"><div class="group"><label for="newInterventionName">개입 이름</label><input id="newInterventionName" type="text" placeholder="예: 어법끝 실전 훈련"></div><div class="group"><label for="newInterventionRound">시작 회차</label><input id="newInterventionRound" type="number" min="1" max="50"></div><div class="group full"><label for="newInterventionHypothesis">목적</label><input id="newInterventionHypothesis" type="text" placeholder="예: 어법 정확도와 판별 속도 개선"></div></div><div class="topActions" style="margin-top:12px"><button class="btn primary" id="addInterventionBtn">개입 추가</button></div></div>
+      </div>
+      <div class="card dangerBox" style="margin-top:16px"><h3 style="margin-top:0;color:var(--bad)">초기화</h3><p class="small">모든 수정 기록을 삭제하고 초기 데이터로 되돌립니다.</p><button class="btn bad" id="resetBtn">초기 데이터로 복원</button></div>
+    </section>
+  </main>
+</div>
+
+<nav class="mobileNav" id="mobileNav">
+  <button class="active" data-page="dashboard">종합</button>
+  <button data-page="analysis">분석</button>
+  <button data-page="rounds">기록</button>
+  <button data-page="entry">입력</button>
+  <button data-page="roadmap">목표</button>
+</nav>
+<div id="toast" class="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const STORAGE_KEY='english500_dashboard_v12';
+const oddTypes=['주장','함의','제목','어법','빈칸','빈칸','순서','삽입','장문 제목','장문 어휘'];
+const evenTypes=['요지','주제','어휘','빈칸','빈칸','빈칸','무관 문장','순서','삽입','요약'];
+const difficultyPreset=[72,74,71,76,73,75,70,77,72,74,73,75,71,71.4,74.7,84.2,72.1,77.1,77.2,73.1,74,76,72,78,75,77,73,79,76,78,74,80,77,79,75,81,78,80,76,82,79,81,77,83,80,82,78,84,81,83];
+const presetMap={};
+for(let r=1;r<=50;r++) presetMap[r]={round:r,limitSec:(r%4===0?960:r%8===7?1020:r%8===0?1020:1020),difficulty:difficultyPreset[r-1],threePoint:(r%2?[2,4,5,8]:[3,5,6,10]),types:(r%2?[...oddTypes]:[...evenTypes])};
+Object.assign(presetMap[14],{limitSec:960,threePoint:[3,5,6],difficulty:71.4});
+Object.assign(presetMap[15],{limitSec:1020,threePoint:[2,4,5,8],difficulty:74.7});
+Object.assign(presetMap[16],{limitSec:1080,threePoint:[2,4,5,6,9],difficulty:84.2});
+Object.assign(presetMap[17],{limitSec:1020,threePoint:[2,4,5,8],difficulty:72.1});
+Object.assign(presetMap[18],{limitSec:1020,threePoint:[2,4,5,8],difficulty:77.1});
+Object.assign(presetMap[19],{limitSec:1020,threePoint:[2,4,5,8],difficulty:77.2});
+Object.assign(presetMap[20],{limitSec:960,threePoint:[3,5,6],difficulty:73.1});
+
+const goals=[
+{round:21,stage:1,target:1410,accuracy:80,bottleneck:2,cap:210,focus:'재독 제한·철수 규칙'},
+{round:22,stage:1,target:1380,accuracy:80,bottleneck:2,cap:210,focus:'쉬운 문제 1:15 이내'},
+{round:23,stage:1,target:1350,accuracy:80,bottleneck:2,cap:195,focus:'선지 재검토 축소'},
+{round:24,stage:1,target:1320,accuracy:80,bottleneck:2,cap:195,focus:'1단계 통과 점검'},
+{round:25,stage:2,target:1290,accuracy:80,bottleneck:2,cap:180,focus:'유형별 시간 배분'},
+{round:26,stage:2,target:1260,accuracy:80,bottleneck:2,cap:180,focus:'어법·어휘 1:30'},
+{round:27,stage:2,target:1230,accuracy:80,bottleneck:1,cap:180,focus:'빈칸·순삽 2:30'},
+{round:28,stage:2,target:1200,accuracy:80,bottleneck:1,cap:180,focus:'20분 벽 진입'},
+{round:29,stage:3,target:1185,accuracy:80,bottleneck:1,cap:165,focus:'첫 판단 비율 확대'},
+{round:30,stage:3,target:1170,accuracy:80,bottleneck:1,cap:165,focus:'검토 1:30 제한'},
+{round:31,stage:3,target:1155,accuracy:80,bottleneck:1,cap:165,focus:'근거 확인 후 종료'},
+{round:32,stage:3,target:1140,accuracy:80,bottleneck:1,cap:165,focus:'19분대 안정화'},
+{round:33,stage:4,target:1125,accuracy:80,bottleneck:1,cap:150,focus:'1~4번 6:30'},
+{round:34,stage:4,target:1110,accuracy:80,bottleneck:1,cap:150,focus:'1~6번 10:30'},
+{round:35,stage:4,target:1095,accuracy:80,bottleneck:1,cap:150,focus:'1~8번 14:15'},
+{round:36,stage:4,target:1080,accuracy:80,bottleneck:1,cap:150,focus:'제한시간 적응'},
+{round:37,stage:5,target:1065,accuracy:80,bottleneck:1,cap:150,focus:'17분대 첫 진입'},
+{round:38,stage:5,target:1050,accuracy:80,bottleneck:1,cap:135,focus:'정확도 동시 유지'},
+{round:39,stage:5,target:1035,accuracy:80,bottleneck:1,cap:135,focus:'흔들림 최소화'},
+{round:40,stage:5,target:1020,accuracy:80,bottleneck:1,cap:135,focus:'최종 안정 판정'}];
+const stages=[
+{stage:1,range:'21~24회',name:'정확도 보존형 압축',end:'22:00'},
+{stage:2,range:'25~28회',name:'20분대 초반 진입',end:'20:00'},
+{stage:3,range:'29~32회',name:'20분 벽 안정화',end:'19:00'},
+{stage:4,range:'33~36회',name:'제한시간 적응',end:'18:00'},
+{stage:5,range:'37~40회',name:'안정적인 10분대',end:'17:00'}];
+
+const defaultState={version:'1.2.0',interventions:[
+{id:'vocab',name:'회차별 단어장 사전학습',startRound:19,hypothesis:'모르는 단어로 인한 정지와 재독 감소',active:true},
+{id:'withdraw',name:'근거 회수·철수 규칙',startRound:21,hypothesis:'재독과 장기 체류를 줄여 전체시간 압축',active:true}
+],rounds:[
+{round:14,date:'',limitSec:960,totalSec:1854,wrong:[5,6],difficulty:71.4,difficultyParts:[15.0,17.7,12.5,12.7,13.5],threePoint:[3,5,6],types:[...oddTypes],timingText:'',notes:'문제별 시간 미측정',interventions:[]},
+{round:15,date:'',limitSec:1020,totalSec:1614,wrong:[3,4,5,8,9,10],difficulty:74.7,difficultyParts:[18.1,17.4,15.1,14.4,9.7],threePoint:[2,4,5,8],types:[...oddTypes],timingText:'1-4=7:30 group\n5=3:03\n6=2:03\n7=4:07\n8=2:22\n9-10=7:49 derived',notes:'9~10번 시간은 전체시간에서 역산',interventions:[]},
+{round:16,date:'',limitSec:1080,totalSec:1695,wrong:[2,4,5,6,8,9,10],difficulty:84.2,difficultyParts:[21.9,17.7,17.4,16.6,10.6],threePoint:[2,4,5,6,9],types:[...evenTypes],timingText:'',notes:'문제별 시간 미측정',interventions:[]},
+{round:17,date:'',limitSec:1020,totalSec:1500,wrong:[4,5,9],difficulty:72.1,difficultyParts:[18.1,17.4,13.7,13.2,9.7],threePoint:[2,4,5,8],types:[...oddTypes],timingText:'1-5=14:00 group\n6-10=11:00 derived',notes:'',interventions:[]},
+{round:18,date:'',limitSec:1020,totalSec:2100,wrong:[1,2,7],difficulty:77.1,difficultyParts:[17.5,17.7,18.7,12.9,10.3],threePoint:[2,4,5,8],types:[...evenTypes],timingText:'1-2=5:00 group\n3-6=20:00 group\n7-10=10:00 derived',notes:'',interventions:[]},
+{round:19,date:'',limitSec:1020,totalSec:1980,wrong:[4,8],difficulty:77.2,difficultyParts:[17.5,17.4,17.7,14.0,10.6],threePoint:[2,4,5,8],types:[...oddTypes],timingText:'1=2:00\n2=2:57\n3=4:09\n4=2:36\n5=4:11\n6=4:45\n7=2:41\n8=2:14\n9-10=8:00 group',notes:'단어장 사전학습 시작',interventions:['vocab']},
+{round:20,date:'',limitSec:960,totalSec:1500,wrong:[2,10],difficulty:73.1,difficultyParts:[13.1,17.7,18.1,13.1,11.1],threePoint:[3,5,6],types:[...evenTypes],timingText:'1=2:14\n2=2:55\n3=2:45\n4=2:38\n5=3:11\n6=3:11\n7=1:35\n8=2:27\n9=1:45\n10=3:34',notes:'상세시간 합계가 전체시간보다 1분 15초 큼',interventions:['vocab']}
+]};
+
+let state=loadState();
+let editingRound=null;
+const $=id=>document.getElementById(id);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const fmt=sec=>sec==null||Number.isNaN(sec)?'—':`${Math.floor(Math.round(sec)/60)}:${String(Math.round(sec)%60).padStart(2,'0')}`;
+const parseTime=v=>{if(v==null||v==='') return null; if(typeof v==='number') return Math.round(v); const s=String(v).trim(); if(/^\d+$/.test(s)) return Number(s)*60; const p=s.split(':').map(Number); if(p.some(n=>Number.isNaN(n))) return null; return p.length===2? p[0]*60+p[1] : p.length===3 ? p[0]*3600+p[1]*60+p[2] : null;};
+const nums=s=>[...new Set(String(s||'').split(/[\s,]+/).map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=10))].sort((a,b)=>a-b);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const by=n=>state.rounds.find(r=>r.round===Number(n));
+const sorted=()=>[...state.rounds].sort((a,b)=>a.round-b.round);
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const acc=r=>(10-new Set(r.wrong||[]).size)*10;
+const eff=r=>r.limitSec&&r.totalSec?Math.min(100,r.limitSec/r.totalSec*100):null;
+const growth=r=>eff(r)==null?null:acc(r)*.7+eff(r)*.3;
+const adjusted=r=>growth(r)==null||!Number.isFinite(Number(r.difficulty))?null:Math.max(0,Math.min(100,growth(r)+.3*(Number(r.difficulty)-70)));
+const label=r=>{const a=acc(r), t=eff(r)??0; let s='확인 필요'; if(a>=80&&t>=70) s='안정 우수형'; else if(a>=80) s='정확도 우세·속도 미흡형'; else if(t>=70) s='속도 우세·정확도 보완형'; else if(a>=50) s='균형 개선 필요형'; else s='복합 위험형'; if(Number(r.difficulty)>=80&&a>=70) s='고난도 대응 성공 · '+s; return s;};
+function loadState(){try{const s=localStorage.getItem(STORAGE_KEY); if(!s) return clone(defaultState); const parsed=JSON.parse(s); if(!Array.isArray(parsed.rounds)) throw 0; return parsed;}catch{return clone(defaultState)}}
+function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function toast(msg){const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800)}
+function switchPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page)); document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page)); const meta={dashboard:['성과 종합','누적 성과와 최근 추세를 확인합니다.'],analysis:['취약점·병목','유형별 약점, 병목, 데이터 신뢰도를 분석합니다.'],rounds:['회차 기록','공식 기록과 계산 결과를 관리합니다.'],entry:[editingRound?`${editingRound}회 수정`:'입력·수정','회차를 선택하면 기본값이 자동 입력됩니다.'],roadmap:['21~40회 로드맵','정확도 80%를 유지하며 제한시간에 접근합니다.'],settings:['백업·설정','백업과 학습 개입을 관리합니다.']}; $('pageTitle').textContent=meta[page][0]; $('pageSub').textContent=meta[page][1]; window.scrollTo({top:0,behavior:'smooth'});}
+function parseTimings(text){const items=[]; String(text||'').split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean).forEach(chunk=>{const m=chunk.match(/^(\d+)(?:\s*-\s*(\d+))?\s*=\s*(\d+(?::\d+){1,2})(?:\s+(exact|group|derived|missing))?$/i); if(!m) return; const from=+m[1], to=m[2]?+m[2]:+m[1], sec=parseTime(m[3]); if(from<1||to>10||from>to||sec==null) return; items.push({from,to,seconds:sec,kind:(m[4]||(from===to?'exact':'group')).toLowerCase()});}); return items;}
+function timingSummary(round){const entries=parseTimings(round.timingText); const sum=entries.reduce((a,b)=>a+b.seconds,0); const diff=entries.length?sum-round.totalSec:null; const per=[]; entries.forEach(e=>{const avg=e.seconds/(e.to-e.from+1); for(let q=e.from;q<=e.to;q++) per.push({q,seconds:avg,kind:e.kind,range:e.from===e.to?`${q}`:`${e.from}-${e.to}`})}); return {entries,sum,diff,per};}
+function bottleneckCount(r){return timingSummary(r).per.filter(x=>x.seconds>=180).length}
+function makeRoundRow(r,full){const a=acc(r), t=eff(r), g=growth(r), ad=adjusted(r); return `<tr><td><strong>${r.round}회</strong>${(r.interventions||[]).length?` <span class="badge">${r.interventions.length}개입</span>`:''}</td>${full?`<td>${fmt(r.limitSec)}</td><td>${fmt(r.totalSec)}</td><td>+${fmt(r.totalSec-r.limitSec)}</td>`:`<td>${fmt(r.totalSec)} / ${fmt(r.limitSec)}</td>`}<td>${(r.wrong||[]).length?r.wrong.join('·'):'없음'}</td><td>${a}%</td><td>${t==null?'—':t.toFixed(1)+'%'}</td><td>${g==null?'—':g.toFixed(1)}</td><td>${Number.isFinite(Number(r.difficulty))?Number(r.difficulty).toFixed(1):'—'}</td>${full?`<td>${ad==null?'—':ad.toFixed(1)}</td>`:''}<td><span class="badge ${a>=80?'good':a<50?'bad':'warn'}">${label(r)}</span></td><td><button class="btn sm" data-edit="${r.round}">수정</button></td></tr>`}
+function renderMetrics(){const rounds=sorted(); if(!rounds.length) return; const totalQ=rounds.length*10, totalC=rounds.reduce((s,r)=>s+(10-(r.wrong||[]).length),0), latest=rounds.at(-1); const avgActual=avg(rounds.map(r=>r.totalSec)); const avgOver=avg(rounds.map(r=>r.totalSec-r.limitSec)); const gs=rounds.map(growth).filter(x=>x!=null); const ds=rounds.map(r=>Number(r.difficulty)).filter(Number.isFinite); $('metricGrid').innerHTML=[['분석 범위',`${rounds[0].round}~${latest.round}회`,`${rounds.length}회 · ${totalQ}문항`],['평균 실제시간',fmt(avgActual),`평균 초과 +${fmt(avgOver)}`],['누적 정확도',`${(totalC/totalQ*100).toFixed(1)}%`,`${totalC}/${totalQ} 정답`],['평균 성장지수',avg(gs).toFixed(1),'정확도 70% + 시간효율 30%'],['평균 객관 난이도',avg(ds).toFixed(1),'회차별 내장 기본값 포함']].map(x=>`<div class="card metric"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]}</div></div>`).join(''); const recent3=rounds.slice(-3), prev3=rounds.slice(-6,-3); const recentAcc=avg(recent3.map(acc)); const recentTime=avg(recent3.map(r=>r.totalSec)); let trend='표본 축적 단계'; if(recent3.length===3&&prev3.length===3){const delta=avg(recent3.map(growth))-avg(prev3.map(growth)); trend=delta>=8?'회복형':delta<=-8?'하락형':'정체·안정형';} $('overallCallout').innerHTML=`<small>현재 종합 평가</small><h3>${trend} · ${recentAcc>=80?'정확도 안정':'정확도 보완 필요'} · ${recentTime<=1500?'25분권 진입':'속도 병목 지속'}</h3><p>최근 3회 평균 정확도는 <strong>${recentAcc.toFixed(1)}%</strong>, 평균시간은 <strong>${fmt(recentTime)}</strong>입니다. 우선순위는 정확도 80%를 유지하면서 3분 이상 병목을 줄이는 것입니다.</p>`;}
+function renderPerformanceChart(){const data=sorted().filter(r=>growth(r)!=null); const svg=$('performanceChart'); const W=820,H=360,L=52,R=22,T=22,B=48,CW=W-L-R,CH=H-T-B; const x=i=>data.length===1?L+CW/2:L+i*CW/(data.length-1); const y=v=>T+CH-(v/100)*CH; let h=''; [0,20,40,60,80,100].forEach(v=>{const yy=y(v); h+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#ddd7eb" stroke-dasharray="4 5"/><text x="${L-9}" y="${yy+4}" text-anchor="end" fill="#716d7a" font-size="11">${v}</text>`}); const series=[{fn:growth,color:'#5E47A8',dash:''},{fn:r=>Number(r.difficulty),color:'#856fd0',dash:'8 6'},{fn:adjusted,color:'#1d704f',dash:'3 5'}]; series.forEach(s=>{const pts=data.map((r,i)=>({x:x(i),y:s.fn(r)})).filter(p=>Number.isFinite(p.y)); if(!pts.length) return; h+=`<path d="${pts.map((p,i)=>`${i?'L':'M'} ${p.x} ${y(p.y)}`).join(' ')}" fill="none" stroke="${s.color}" stroke-width="3" ${s.dash?`stroke-dasharray="${s.dash}"`:''}/>`;}); data.forEach((r,i)=>{h+=`<circle cx="${x(i)}" cy="${y(growth(r))}" r="4.3" fill="#5E47A8"/><text x="${x(i)}" y="${H-16}" text-anchor="middle" fill="#716d7a" font-size="11">${r.round}회</text>`}); svg.innerHTML=h;}
+function renderTables(){const rounds=sorted(); $('recentRows').innerHTML=rounds.slice(-5).reverse().map(r=>makeRoundRow(r,false)).join('')||'<tr><td colspan="9">기록 없음</td></tr>'; $('allRoundRows').innerHTML=rounds.map(r=>makeRoundRow(r,true)).join(''); document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>loadEdit(+b.dataset.edit));}
+function renderWeak(){const stats={}; sorted().forEach(r=>{const types=(r.types&&r.types.length===10)?r.types:(r.round%2?[...oddTypes]:[...evenTypes]); types.forEach((type,i)=>{if(!stats[type]) stats[type]={type,total:0,correct:0,times:[]}; stats[type].total++; if(!(r.wrong||[]).includes(i+1)) stats[type].correct++; const t=timingSummary(r).per.find(x=>x.q===i+1); if(t) stats[type].times.push(t.seconds);});}); const arr=Object.values(stats).map(s=>({...s,acc:s.total?s.correct/s.total*100:0,avgTime:s.times.length?avg(s.times):null})).sort((a,b)=>a.acc-b.acc||b.total-a.total); $('weakTypeList').innerHTML=arr.slice(0,8).map(s=>`<div class="item"><div class="row"><h4>${esc(s.type)}</h4><strong>${s.acc.toFixed(1)}%</strong></div><p>${s.correct}/${s.total} 정답${s.avgTime!=null?` · 평균 ${fmt(s.avgTime)}`:' · 시간 표본 없음'}</p><div class="track"><div class="fill" style="width:${s.acc}%"></div></div></div>`).join('');}
+function renderDiagnostics(){const bott=[]; const audits=[]; sorted().forEach(r=>{const ts=timingSummary(r); ts.per.filter(x=>x.seconds>=180).forEach(x=>bott.push({round:r.round,q:x.q,time:x.seconds,kind:x.kind,wrong:(r.wrong||[]).includes(x.q),range:x.range})); let status='상세시간 미측정',cls='warn'; if(ts.entries.length){ if(Math.abs(ts.diff)<=2){status='상세합과 전체시간 일치';cls='good';} else {status=`상세합 ${fmt(ts.sum)} · 차이 ${ts.diff>0?'+':''}${fmt(Math.abs(ts.diff))}`; cls='bad';}} audits.push({round:r.round,quality:[...new Set(ts.entries.map(x=>x.kind))].join(', ')||'missing',status,cls});}); bott.sort((a,b)=>b.time-a.time); $('bottleneckList').innerHTML=bott.slice(0,12).map(x=>`<div class="item"><div class="row"><h4>${x.round}회 ${x.q}번</h4><span class="badge ${x.wrong?'bad':'warn'}">${fmt(x.time)}</span></div><p>${x.wrong?'오답 병목':'위험 정답'} · ${x.kind}${x.range!==String(x.q)?` · ${x.range} 구간 평균`:''}</p></div>`).join('')||'<div class="item">3분 이상 병목이 없습니다.</div>'; $('auditGrid').innerHTML=audits.map(a=>`<div class="card"><div class="row"><strong>${a.round}회</strong><span class="badge ${a.cls}">${a.quality}</span></div><p class="small">${a.status}</p></div>`).join('');}
+function renderInterventions(){ $('interventionChecks').innerHTML=state.interventions.map(i=>`<label class="check"><input type="checkbox" class="icheck" value="${esc(i.id)}">${esc(i.name)} (${i.startRound}회~)</label>`).join(''); $('interventionGrid').innerHTML=state.interventions.map(i=>{const before=sorted().filter(r=>r.round<i.startRound); const after=sorted().filter(r=>r.round>=i.startRound&&(r.interventions||[]).includes(i.id)); return `<div class="card"><div class="row"><strong>${esc(i.name)}</strong><span class="badge">${i.startRound}회 시작</span></div><p class="small">${esc(i.hypothesis||'')}</p><div class="previewChips"><span class="chip">전 정확도 ${before.length?avg(before.map(acc)).toFixed(1)+'%':'—'}</span><span class="chip">후 정확도 ${after.length?avg(after.map(acc)).toFixed(1)+'%':'—'}</span><span class="chip">전 시간 ${before.length?fmt(avg(before.map(r=>r.totalSec))):'—'}</span><span class="chip">후 시간 ${after.length?fmt(avg(after.map(r=>r.totalSec))):'—'}</span></div></div>`}).join(''); $('interventionManager').innerHTML=state.interventions.map(i=>`<div class="item"><div class="row"><h4>${esc(i.name)}</h4><button class="btn sm bad" data-remove-i="${esc(i.id)}">삭제</button></div><p>${i.startRound}회 시작 · ${esc(i.hypothesis||'')}</p></div>`).join(''); document.querySelectorAll('[data-remove-i]').forEach(b=>b.onclick=()=>removeIntervention(b.dataset.removeI));}
+function goalStatus(g){const r=by(g.round); if(!r) return {l:'미응시',c:''}; const a=acc(r), b=bottleneckCount(r); if(a>=g.accuracy&&r.totalSec<=g.target&&b<=g.bottleneck) return {l:'완전 달성',c:'good'}; if(a>=g.accuracy) return {l:'정확도 달성',c:'warn'}; if(r.totalSec<=g.target) return {l:'속도만 달성',c:'warn'}; return {l:'재도전 필요',c:'bad'};}
+function renderRoadmap(){const next=goals.find(g=>!by(g.round))||goals.at(-1); $('nextGoalCallout').innerHTML=`<small>다음 공식 목표 · ${next.round}회</small><h3>정확도 ${next.accuracy}% 이상 · 전체시간 ${fmt(next.target)} 이내 · 3분 이상 병목 ${next.bottleneck}개 이하</h3><p>객관 난이도 80점 이상 회차는 시간을 최대 2분 완화하되 정확도 70% 이상을 유지합니다.</p>`; const cs=Math.min(5,Math.max(1,Math.ceil((next.round-20)/4))); $('stageCards').innerHTML=stages.map(s=>`<div class="card"><span class="badge ${s.stage<cs?'good':s.stage===cs?'':'warn'}">${s.stage<cs?'진행 완료':s.stage===cs?'현재 단계':'예정'}</span><h4 style="margin:10px 0 4px">${s.stage}단계</h4><div style="font-size:24px;font-weight:800;letter-spacing:-.03em">${s.end}</div><p class="small">${s.range} · ${s.name}</p></div>`).join(''); $('goalRows').innerHTML=goals.map(g=>{const s=goalStatus(g); return `<tr><td><strong>${g.round}회</strong></td><td>${g.stage}단계</td><td>${fmt(g.target)}</td><td>${g.accuracy}% 이상</td><td>${g.bottleneck}개 이하</td><td>${fmt(g.cap)}</td><td>${g.focus}</td><td><span class="badge ${s.c}">${s.l}</span></td></tr>`}).join(''); renderRoadmapChart();}
+function renderRoadmapChart(){const rounds=sorted().filter(r=>r.round>=14&&r.round<=40), svg=$('roadmapChart'); const W=840,H=360,L=55,R=22,T=22,B=46,CW=W-L-R,CH=H-T-B; const x=r=>L+((r-14)/(40-14))*CW, y=s=>T+CH-(((s/60)-15)/22)*CH; let h=''; [15,20,25,30,35].forEach(v=>{const yy=y(v*60); h+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#ddd7eb" stroke-dasharray="4 5"/><text x="${L-8}" y="${yy+4}" text-anchor="end" fill="#716d7a" font-size="11">${v}분</text>`}); [14,20,24,28,32,36,40].forEach(r=>h+=`<text x="${x(r)}" y="${H-16}" text-anchor="middle" fill="#716d7a" font-size="11">${r}회</text>`); if(rounds.length){h+=`<path d="${rounds.map((r,i)=>`${i?'L':'M'} ${x(r.round)} ${y(r.totalSec)}`).join(' ')}" fill="none" stroke="#5E47A8" stroke-width="3"/>`; rounds.forEach(r=>h+=`<circle cx="${x(r.round)}" cy="${y(r.totalSec)}" r="4.3" fill="#5E47A8"/>`);} const target=[{round:20,target:1500},...goals]; h+=`<path d="${target.map((g,i)=>`${i?'L':'M'} ${x(g.round)} ${y(g.target)}`).join(' ')}" fill="none" stroke="#856fd0" stroke-width="3" stroke-dasharray="8 6"/>`; [21,24,28,32,36,40].forEach(r=>{const g=goals.find(x=>x.round===r); h+=`<circle cx="${x(r)}" cy="${y(g.target)}" r="4" fill="#856fd0"/>`;}); svg.innerHTML=h;}
+function fillRoundOptions(){ $('fRound').innerHTML=Array.from({length:50},(_,i)=>i+1).map(r=>`<option value="${r}">${r}회</option>`).join(''); }
+function selectedWrong(){return Array.from(document.querySelectorAll('.wrongBtn.on')).map(b=>+b.dataset.num).sort((a,b)=>a-b)}
+function syncWrongField(){ $('fWrong').value=selectedWrong().join(', '); previewForm(); }
+function setWrongButtons(list){document.querySelectorAll('.wrongBtn').forEach(b=>b.classList.toggle('on',list.includes(+b.dataset.num))); $('fWrong').value=list.join(', ')}
+function renderWrongButtons(){ $('wrongButtons').innerHTML=Array.from({length:10},(_,i)=>`<button class="wrongBtn" type="button" data-num="${i+1}">${i+1}</button>`).join(''); document.querySelectorAll('.wrongBtn').forEach(b=>b.onclick=()=>{b.classList.toggle('on'); syncWrongField();}); $('wrongNoneBtn').onclick=()=>{setWrongButtons([]); previewForm()}; $('wrongClearBtn').onclick=()=>{setWrongButtons([]); previewForm()}; }
+function applyPreset(round, overwrite=false){const p=presetMap[round]; if(!p) return; $('presetRoundLabel').textContent=`${round}회 기본값`; $('presetLimitLabel').textContent=fmt(p.limitSec); $('presetDiffLabel').textContent=p.difficulty.toFixed(1); $('presetThreeLabel').textContent=p.threePoint.join('·'); if(overwrite || !$('fLimit').value) $('fLimit').value=fmt(p.limitSec); if(overwrite || !$('fDiff').value) $('fDiff').value=p.difficulty; if(overwrite || !$('f3').value) $('f3').value=p.threePoint.join(', '); if(overwrite || !$('fTypes').value) $('fTypes').value=''; if(!editingRound){$('fDate').value ||= new Date().toISOString().slice(0,10)} previewForm(); }
+function clearForm(){editingRound=null; $('editBadge').style.display='none'; $('deleteRoundBtn').style.display='none'; $('formTitle').textContent='새 회차 입력'; ['fDate','fTotal','fLimit','fWrong','fDiff','f3','fTiming','fTypes','fNotes','d1','d2','d3','d4','d5'].forEach(id=>$(id).value=''); document.querySelectorAll('.icheck').forEach(c=>c.checked=false); $('fRound').value=Math.min(50,Math.max(...sorted().map(r=>r.round),20)+1); setWrongButtons([]); applyPreset(+$('fRound').value,true); previewForm(); }
+function loadEdit(round){const r=by(round); if(!r) return; editingRound=round; $('formTitle').textContent=`${round}회 기록 수정`; $('editBadge').style.display='inline-flex'; $('deleteRoundBtn').style.display='inline-flex'; $('fRound').value=r.round; $('fDate').value=r.date||''; $('fTotal').value=fmt(r.totalSec); $('fLimit').value=fmt(r.limitSec); $('fDiff').value=r.difficulty??''; $('f3').value=(r.threePoint||[]).join(', '); $('fTiming').value=r.timingText||''; $('fTypes').value=(r.types||[]).join(', '); $('fNotes').value=r.notes||''; ['d1','d2','d3','d4','d5'].forEach((id,i)=>$(id).value=(r.difficultyParts||[])[i]??''); setWrongButtons(r.wrong||[]); document.querySelectorAll('.icheck').forEach(c=>c.checked=(r.interventions||[]).includes(c.value)); applyPreset(round,false); switchPage('entry'); previewForm(); }
+function readForm(){const parts=[1,2,3,4,5].map(i=>$('d'+i).value===''?null:+$('d'+i).value); const manualDiff=$('fDiff').value; const diff=manualDiff!==''?+manualDiff:(parts.every(v=>v!==null)?parts.reduce((a,b)=>a+b,0):null); return {round:+$('fRound').value,date:$('fDate').value,limitSec:parseTime($('fLimit').value),totalSec:parseTime($('fTotal').value),wrong:nums($('fWrong').value),difficulty:diff,difficultyParts:parts,threePoint:nums($('f3').value),timingText:$('fTiming').value.trim(),types:String($('fTypes').value).trim()?String($('fTypes').value).split(',').map(s=>s.trim()).filter(Boolean):[...(+$('fRound').value%2?oddTypes:evenTypes)],notes:$('fNotes').value.trim(),interventions:Array.from(document.querySelectorAll('.icheck:checked')).map(x=>x.value)}; }
+function previewForm(){const r=readForm(); if(!r.round||!r.totalSec||!r.limitSec){$('formPreview').textContent='전체시간과 오답을 입력하면 예상 지표가 표시됩니다.'; return;} const ts=timingSummary(r); $('formPreview').innerHTML=`<div class="previewChips"><span class="chip">정확도 <strong>${acc(r)}%</strong></span><span class="chip">시간효율 <strong>${eff(r).toFixed(1)}%</strong></span><span class="chip">성장지수 <strong>${growth(r).toFixed(1)}</strong></span><span class="chip">난도 보정 <strong>${adjusted(r)==null?'—':adjusted(r).toFixed(1)}</strong></span><span class="chip">병목 <strong>${bottleneckCount(r)}개</strong></span></div><p class="small" style="margin-bottom:0">${ts.entries.length?`상세시간 합계 ${fmt(ts.sum)} · 전체시간과 ${ts.diff>=0?'+':''}${fmt(Math.abs(ts.diff))} 차이`:'상세시간 미측정'}</p>`; }
+function saveRound(){const r=readForm(); if(!Number.isInteger(r.round)||r.round<1||r.round>50) return alert('회차는 1~50 사이여야 합니다.'); if(!r.limitSec) return alert('PDF 제한시간을 입력하세요.'); if(!r.totalSec) return alert('실제 전체시간을 입력하세요.'); if(r.difficulty!=null&&(!Number.isFinite(r.difficulty)||r.difficulty<1||r.difficulty>100)) return alert('객관 난이도는 1~100 사이여야 합니다.'); const dup=state.rounds.find(x=>x.round===r.round&&x.round!==editingRound); if(dup&&!confirm(`${r.round}회 기록이 이미 있습니다. 덮어쓸까요?`)) return; state.rounds=state.rounds.filter(x=>x.round!==r.round&&x.round!==editingRound); state.rounds.push(r); persist(); renderAll(); loadEdit(r.round); toast(`${r.round}회 기록 저장 완료`); }
+function deleteRound(){if(!editingRound) return; if(!confirm(`${editingRound}회 기록을 삭제할까요?`)) return; state.rounds=state.rounds.filter(r=>r.round!==editingRound); persist(); renderAll(); clearForm(); switchPage('rounds'); toast('회차 기록 삭제 완료'); }
+function addIntervention(){const name=$('newInterventionName').value.trim(), start=+$('newInterventionRound').value, hyp=$('newInterventionHypothesis').value.trim(); if(!name||!Number.isInteger(start)) return alert('개입 이름과 시작 회차를 입력하세요.'); state.interventions.push({id:'i_'+Date.now().toString(36),name,startRound:start,hypothesis:hyp,active:true}); persist(); $('newInterventionName').value=''; $('newInterventionRound').value=''; $('newInterventionHypothesis').value=''; renderAll(); toast('학습 개입 추가 완료'); }
+function removeIntervention(id){const item=state.interventions.find(i=>i.id===id); if(!item||!confirm(`‘${item.name}’ 개입을 삭제할까요?`)) return; state.interventions=state.interventions.filter(i=>i.id!==id); state.rounds.forEach(r=>r.interventions=(r.interventions||[]).filter(x=>x!==id)); persist(); renderAll(); toast('학습 개입 삭제 완료'); }
+function csvEsc(v){const s=String(v??''); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
+function download(name,content,type){const blob=new Blob([content],{type}), url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),600); }
+function exportJson(){download(`영어500제_백업_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(state,null,2),'application/json')}
+function exportCsv(){const header=['회차','응시일','제한시간','실제시간','초과시간','오답','정확도','시간효율','성장지수','객관난이도','난도보정','평가','특이사항']; const rows=sorted().map(r=>[r.round,r.date||'',fmt(r.limitSec),fmt(r.totalSec),fmt(r.totalSec-r.limitSec),(r.wrong||[]).join(' '),acc(r),eff(r)?.toFixed(1)??'',growth(r)?.toFixed(1)??'',r.difficulty??'',adjusted(r)?.toFixed(1)??'',label(r),r.notes||'']); download(`영어500제_기록_${new Date().toISOString().slice(0,10)}.csv`,'\uFEFF'+[header,...rows].map(row=>row.map(csvEsc).join(',')).join('\n'),'text/csv;charset=utf-8')}
+function importJson(file){const rd=new FileReader(); rd.onload=()=>{try{const o=JSON.parse(rd.result); if(!Array.isArray(o.rounds)) throw 0; state=o; persist(); renderAll(); clearForm(); toast('백업 불러오기 완료');}catch{alert('올바른 JSON 백업이 아닙니다.')}}; rd.readAsText(file); }
+function renderAll(){renderMetrics(); renderPerformanceChart(); renderTables(); renderWeak(); renderDiagnostics(); renderInterventions(); renderRoadmap(); }
+
+fillRoundOptions(); renderWrongButtons(); renderInterventions(); clearForm(); renderAll();
+
+document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
+$('quickAddBtn').onclick=()=>{clearForm(); switchPage('entry')}; $('addFromTableBtn').onclick=()=>{clearForm(); switchPage('entry')}; $('printBtn').onclick=()=>window.print(); $('saveRoundBtn').onclick=saveRound; $('clearFormBtn').onclick=clearForm; $('deleteRoundBtn').onclick=deleteRound; $('exportJsonBtn').onclick=exportJson; $('exportCsvBtn').onclick=exportCsv; $('importJsonInput').onchange=e=>{if(e.target.files[0]) importJson(e.target.files[0]); e.target.value=''}; $('addInterventionBtn').onclick=addIntervention; $('resetBtn').onclick=()=>{if(confirm('모든 수정 기록을 삭제하고 초기 데이터로 되돌릴까요?')){state=clone(defaultState); persist(); renderAll(); clearForm(); switchPage('dashboard'); toast('초기 데이터 복원 완료');}}; $('fRound').onchange=()=>applyPreset(+$('fRound').value,true); $('applyPresetBtn').onclick=()=>applyPreset(+$('fRound').value,true); $('fWrong').addEventListener('input',()=>{setWrongButtons(nums($('fWrong').value)); previewForm();}); ['fTotal','fLimit','fDiff','fTiming','fNotes'].forEach(id=>$(id).addEventListener('input',previewForm)); document.querySelectorAll('[data-insert]').forEach(b=>b.onclick=()=>{const t=$('fTiming'); t.value=(t.value.trim()?t.value.trim()+'\n':'')+b.dataset.insert; previewForm();});
+})();
+</script>
+<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
+</body></html>
