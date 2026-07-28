@@ -1,5 +1,0 @@
-1. ZIP의 내용 전체를 GitHub 저장소에 업로드합니다.
-2. GitHub 저장소 Settings > Pages에서 Source를 GitHub Actions로 선택합니다.
-3. 배포 주소를 iPad Safari로 열고 공유 > 홈 화면에 추가를 누릅니다.
-4. 회차 입력은 앱의 '입력·수정' 메뉴에서 합니다.
-5. 기기 변경 전에 '백업·설정'에서 JSON 백업을 저장합니다.
